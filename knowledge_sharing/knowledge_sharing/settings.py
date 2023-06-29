@@ -77,10 +77,22 @@ WSGI_APPLICATION = 'knowledge_sharing.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'knowledge_sharing',  # 数据库名字
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'HOST': 'dev-dsk-dawez-2c-0d29dbaa.us-west-2.amazon.com',  # 那台机器安装了MySQL
+        'PORT': 3309,
     }
 }
 
