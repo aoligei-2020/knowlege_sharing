@@ -1,0 +1,255 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+
+{% block content %}
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-sm-9">
+                <div class="panel panel-default">
+                    <div class="panel-heading"><span class="glyphicon glyphicon-fire"> 质量之星 </span></div>
+                    <div class="panel-body">
+                        <div id="t1" style="width: 100%;">
+                          此处展示上传的只是中质量最好的两个
+                        </div>
+                    </div>
+
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>发布者</th>
+                            <th>Bucket</th>
+                            <th>标题</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>7</td>
+                            <td>linrongu</td>
+                            <td>COS</td>
+                            <td>我也不知道说啥</td>
+                            <td>2023/06/26 - 9:52:29 AM</td>
+                            <td>
+                                <a class="btn btn-primary btn-xs" href="/knowledge/detail/7/">查看</a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>1</td>
+                            <td>dawez</td>
+                            <td>COS</td>
+                            <td>如何创建一个简单的网站</td>
+                            <td>2023/06/12 - 7:03:50 AM</td>
+                            <td>
+                                <a class="btn btn-primary btn-xs" href="/knowledge/detail/1/">查看</a>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading"><span class="glyphicon glyphicon-leaf"> 数量之星 </span></div>
+                    <div class="panel-body">
+                        <div id="t2" style="width: 100%;">
+                            <div class="media">
+                              <div class="media-left">
+                                <a href="https://phonetool.amazon.com/users/dawez">
+                                  <img height="90px" class="media-object" src="https://internal-cdn.amazon.com/badgephotos.amazon.com/?fullsizeimage=1&give404ifmissing=1&uid=dawez" alt="图片无法加载">
+                                </a>
+                              </div>
+                              <div class="media-body">
+                                <h4 class="media-heading">dawez</h4>
+                                这位同志本月创建了最多的知识分享，数量为 6
+                              </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        页脚要不要说点什么
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">本年度每月总knowledge数量变化折线图</div>
+            <div class="panel-body">
+                <div id="m1" style="width: 100%;height: 250px"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">本月度各Bucket柱状图</div>
+                    <div class="panel-body">
+                        <div id="m2" style="width: 100%;height: 250px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">本年度各Bucket柱状图</div>
+                    <div class="panel-body">
+                        <div id="m3" style="width: 100%;height: 250px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/echarts.js' %}"></script>
+    <script type="text/javascript">
+
+        $(function () {
+            initLine();
+            initBarMonthly();
+            initBarYearly();
+        })
+
+        function initLine() {
+            var myChart = echarts.init(document.getElementById('m1'));
+            var option = {
+                title: {
+                    text: '年度数量变化趋势',
+                    left: 'center',
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: [],
+                    bottom: 0
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: []
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: []
+            };
+
+            $.ajax({
+                url: '/chart/line/',
+                type: 'get',
+                dataType: 'JSON',
+                success: function (response) {
+                    if (response.status) {
+                        option.legend.data = response.data.legend;
+                        option.xAxis.data = response.data.x_axis;
+                        option.series = response.data.series_list;
+
+                        myChart.setOption(option);
+                    }
+                }
+            })
+        }
+
+        function initBarMonthly() {
+            var myChart = echarts.init(document.getElementById('m2'));
+            var option = {
+                title: {
+                    text: '月度各Bucket统计',
+                    textAlign: 'auto',
+                    left: 'center',
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    bottom: 0
+                },
+                series: [
+                    {
+                        name: '知识分享数量',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+
+            $.ajax({
+                url: '/chart/bar_monthly/',
+                type: 'get',
+                datatype: 'JSON',
+                success: function (response) {
+                    if (response.status) {
+                        option.series[0].data = response.data;
+
+                        myChart.setOption(option);
+                    }
+                }
+            })
+        }
+
+        function initBarYearly() {
+            var myChart = echarts.init(document.getElementById('m3'));
+            var option = {
+                title: {
+                    text: '年度各Bucket统计',
+                    textAlign: 'auto',
+                    left: 'center',
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    bottom: 0
+                },
+                series: [
+                    {
+                        name: '知识分享数量',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+
+            $.ajax({
+                url: '/chart/bar_monthly/',
+                type: 'get',
+                datatype: 'JSON',
+                success: function (response) {
+                    if (response.status) {
+                        option.series[0].data = response.data;
+
+                        myChart.setOption(option);
+                    }
+                }
+            })
+        }
+
+    </script>
+
+{% endblock %}

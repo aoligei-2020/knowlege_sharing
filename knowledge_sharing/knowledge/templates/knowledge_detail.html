@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"> {{ knowledge.title }} </h3>
+            </div>
+            <div class="panel-body">
+                <div>
+                    <img height="60px" class="media-object" src="https://internal-cdn.amazon.com/badgephotos.amazon.com/?fullsizeimage=1&give404ifmissing=1&uid={{ knowledge.login }}" alt="头像加载失败">
+                    <span>作者：{{ knowledge.login }}</span> <span>发布日期：{{ knowledge.create_time }}</span>
+                </div>
+
+                <div class="content">
+                    {{ knowledge.content|safe }}
+                </div>
+
+            </div>
+
+            <div class="panel-footer">
+                <div class="level">
+                    <div class="level-left">
+                        {% if prev_knowledge %}
+                        <span>上一篇：</span><a href="/knowledge/detail/{{ prev_knowledge.id }}/" class="level-item">{{ prev_knowledge.title }}</a>
+                        {% else %}
+                        <span class=" has-text-danger-dark is-size-7">无上一篇</span>
+                        {% endif %}
+                    </div>
+                    <div class="level-right">
+                        {% if next_knowledge %}
+                        <span>下一篇：</span><a href="/knowledge/detail/{{ next_knowledge.id }}/" class="level-item">{{ next_knowledge.title }}</a>
+                        {% else %}
+                        <span class=" has-text-danger-dark is-size-7">已经是最后一篇</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
