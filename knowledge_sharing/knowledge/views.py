@@ -1,7 +1,10 @@
+import datetime
+
+from django.db.models.functions import ExtractMonth
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
-from django.db.models import Q, F
+from django.db.models import Q, F, Count
 from django.views.generic.base import View
 from .models import Knowledge
 from .forms import AddKnowledgeForm
@@ -36,7 +39,7 @@ def knowledge_detail(request, knowledge_id):
 def knowledge_list(request):
     search_data = request.GET.get('q', "")
     queryset = Knowledge.objects.filter(Q(content__contains=search_data)|Q(login__startswith=search_data)|Q(bucket__startswith=search_data)|Q(title__contains=search_data)).order_by("-create_time")
-    page_object = Pagination(request, queryset)
+    page_object = Pagination(request, queryset, page_size=50)
     context = {
         'search_data': search_data,
         'queryset': page_object.page_queryset,
@@ -46,21 +49,28 @@ def knowledge_list(request):
 
 
 def chart_list(request):
-    return render(request, 'chart_list.html')
+    highlight_queryset = Knowledge.objects.filter(highlight=True)
+    most_frequent = Knowledge.objects.values('login').annotate(count=Count('id')).order_by('-count').first()
+
+    context = {
+        'highlight_queryset': highlight_queryset,
+        'most_frequent': most_frequent,
+    }
+
+    return render(request, 'chart_list.html', context)
 
 
 def chart_bar_yearly(request):
 
-    db_data_list = [
-        {"value": 15, "name": 'COS'},
-        {"value": 20, "name": 'Deal Creation'},
-        {"value": 36, "name": 'Deal Support'},
-        {"value": 10, "name": 'Merchandising'},
-        {"value": 45, "name": 'CMBS'},
-        {"value": 66, "name": 'Instock'},
-        {"value": 20, "name": 'Ad-hoc'},
-        {"value": 50, "name": 'AMA'},
-    ]
+    db_data_list = []
+
+    queryset = Knowledge.objects.filter(create_time__year=datetime.datetime.now().year).values('bucket').annotate(count=Count('id')).order_by('-count')
+    d = dict(Knowledge.BUCKET)
+    for result in queryset:
+        db_data_list.append({
+            'name': d[result['bucket']],
+            'value': result['count'],
+        })
 
     result = {
         'status': True,
@@ -72,16 +82,15 @@ def chart_bar_yearly(request):
 
 def chart_bar_monthly(request):
 
-    db_data_list = [
-        {"value": 15, "name": 'COS'},
-        {"value": 20, "name": 'Deal Creation'},
-        {"value": 36, "name": 'Deal Support'},
-        {"value": 10, "name": 'Merchandising'},
-        {"value": 45, "name": 'CMBS'},
-        {"value": 66, "name": 'Instock'},
-        {"value": 20, "name": 'Ad-hoc'},
-        {"value": 50, "name": 'AMA'},
-    ]
+    db_data_list = []
+
+    queryset = Knowledge.objects.filter(create_time__month=datetime.datetime.now().month).values('bucket').annotate(count=Count('id')).order_by('-count')
+    d = dict(Knowledge.BUCKET)
+    for result in queryset:
+        db_data_list.append({
+            'name': d[result['bucket']],
+            'value': result['count'],
+        })
 
     result = {
         'status': True,
@@ -92,16 +101,19 @@ def chart_bar_monthly(request):
 
 
 def chart_line(request):
-    legend = ["2023年", ]
+
+    queryset = Knowledge.objects.filter(create_time__year=datetime.datetime.now().year).annotate(month=ExtractMonth('create_time')).values('month').annotate(count=Count('create_time'))
+
+    legend = [f"{datetime.datetime.now().year}年", ]
     series_list = [
         {
-            "name": '2023年',
+            "name": f'{datetime.datetime.now().year}年',
             "type": 'line',
             "stack": 'Total',
-            "data": [15, 20, 36, 10, 10, 10, 45, 10, 66, 40, 20, 50]
+            "data": [_['count'] for _ in queryset]
         },
     ]
-    x_axis = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+    x_axis = [f"{_['month']}月" for _ in queryset]
 
     result = {
         "status": True,

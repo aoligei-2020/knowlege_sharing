@@ -28,26 +28,20 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td>7</td>
-                            <td>linrongu</td>
-                            <td>COS</td>
-                            <td>我也不知道说啥</td>
-                            <td>2023/06/26 - 9:52:29 AM</td>
-                            <td>
-                                <a class="btn btn-primary btn-xs" href="/knowledge/detail/7/">查看</a>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>1</td>
-                            <td>dawez</td>
-                            <td>COS</td>
-                            <td>如何创建一个简单的网站</td>
-                            <td>2023/06/12 - 7:03:50 AM</td>
-                            <td>
-                                <a class="btn btn-primary btn-xs" href="/knowledge/detail/1/">查看</a>
-                            </td>
-                          </tr>
+
+                            {% for obj in highlight_queryset %}
+                                <tr>
+                                    <th>{{ obj.id }}</th>
+                                    <td>{{ obj.login }}</td>
+                                    <td>{{ obj.get_bucket_display }}</td>
+                                    <td>{{ obj.title }}</td>
+                                    <td>{{ obj.create_time|date:"Y/m/d - g:i:s A" }}</td>
+                                    <td>
+                                        <a class="btn btn-primary btn-xs" href="/knowledge/detail/{{ obj.id }}/">查看</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
                         </tbody>
                       </table>
 
@@ -61,13 +55,13 @@
                         <div id="t2" style="width: 100%;">
                             <div class="media">
                               <div class="media-left">
-                                <a href="https://phonetool.amazon.com/users/dawez">
-                                  <img height="90px" class="media-object" src="https://internal-cdn.amazon.com/badgephotos.amazon.com/?fullsizeimage=1&give404ifmissing=1&uid=dawez" alt="图片无法加载">
+                                <a href="https://phonetool.amazon.com/users/{{ most_frequent.login }}">
+                                  <img height="90px" class="media-object" src="https://internal-cdn.amazon.com/badgephotos.amazon.com/?fullsizeimage=1&give404ifmissing=1&uid={{ most_frequent.login }}" alt="图片无法加载">
                                 </a>
                               </div>
                               <div class="media-body">
-                                <h4 class="media-heading">dawez</h4>
-                                这位同志本月创建了最多的知识分享，数量为 6
+                                <h4 class="media-heading">{{ most_frequent.login }}</h4>
+                                这位同志本月创建了最多的知识分享，数量为 {{ most_frequent.count }}
                               </div>
                             </div>
 
@@ -237,7 +231,7 @@
             };
 
             $.ajax({
-                url: '/chart/bar_monthly/',
+                url: '/chart/bar_yearly/',
                 type: 'get',
                 datatype: 'JSON',
                 success: function (response) {

@@ -24,6 +24,8 @@ class Knowledge(models.Model):
     login = models.CharField(max_length=16, verbose_name='Login')
     bucket = models.IntegerField(default=0, choices=BUCKET, verbose_name='Bucket')
     title = models.CharField(max_length=100, verbose_name='Title')
+    approved = models.BooleanField(null=True, verbose_name='已审核')
+    highlight = models.BooleanField(default=False, verbose_name='高亮的')
     content = RichTextUploadingField(verbose_name='Content')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     modify_time = models.DateTimeField(auto_now=True, verbose_name="修改时间")

@@ -11,7 +11,7 @@ class KnowledgeAdmin(admin.ModelAdmin):
 
     list_display = ['id', 'login', 'bucket', 'title', 'create_time']
     search_fields = ['title', 'login', 'bucket']
-    list_filter = ['bucket']
+    list_filter = ['bucket', 'approved', 'highlight']
     date_hierarchy = 'create_time'
     list_per_page = 25
     ordering = ['create_time']
