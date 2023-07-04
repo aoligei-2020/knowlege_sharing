@@ -91,8 +91,8 @@ DATABASES = {
         'NAME': 'knowledge',  # 数据库名字
         'USER': 'root',
         'PASSWORD': '123456',
-        'HOST': 'dev-dsk-dawez-2c-f619f699.us-west-2.amazon.com',  # 那台机器安装了MySQL
-        'PORT': 3310,
+        'HOST': 'localhost',  # 那台机器安装了MySQL
+        'PORT': 3306,
     }
 }
 

@@ -34,22 +34,6 @@ class BootStrapForm(BootStrap, forms.Form):
 
 class AddKnowledgeForm(BootStrapModelForm):
 
-    # BUCKET = (
-    #     (0, 'COS'),
-    #     (1, 'Deal Creation'),
-    #     (2, 'Deal Support'),
-    #     (3, 'Merchandising'),
-    #     (4, 'CMBS'),
-    #     (5, 'Instock'),
-    #     (6, 'Ad-hoc'),
-    #     (7, 'AMA'),
-    # )
-    #
-    # login = forms.CharField(label='创建者login', max_length=16)
-    # bucket = forms.ChoiceField(label='创建者所属Bucket', choices=BUCKET)
-    # title = forms.CharField(label='标题', max_length=100)
-    # content = RichTextUploadingFormField(label='内容')
-
     class Meta:
         model = Knowledge
         fields = [
