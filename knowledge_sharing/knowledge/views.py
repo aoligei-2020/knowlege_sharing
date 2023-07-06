@@ -49,8 +49,8 @@ def knowledge_list(request):
 
 
 def chart_list(request):
-    highlight_queryset = Knowledge.objects.filter(highlight=True)
-    most_frequent = Knowledge.objects.values('login').annotate(count=Count('id')).order_by('-count').first()
+    highlight_queryset = Knowledge.objects.filter(Q(highlight=True)&Q(approved=True))
+    most_frequent = Knowledge.objects.filter(approved=True).values('login').annotate(count=Count('id')).order_by('-count').first()
 
     context = {
         'highlight_queryset': highlight_queryset,
@@ -64,7 +64,7 @@ def chart_bar_yearly(request):
 
     db_data_list = []
 
-    queryset = Knowledge.objects.filter(create_time__year=datetime.datetime.now().year).values('bucket').annotate(count=Count('id')).order_by('-count')
+    queryset = Knowledge.objects.filter(Q(create_time__year=datetime.datetime.now().year)&Q(approved=True)).values('bucket').annotate(count=Count('id')).order_by('-count')
     d = dict(Knowledge.BUCKET)
     for result in queryset:
         db_data_list.append({
@@ -84,7 +84,7 @@ def chart_bar_monthly(request):
 
     db_data_list = []
 
-    queryset = Knowledge.objects.filter(create_time__month=datetime.datetime.now().month).values('bucket').annotate(count=Count('id')).order_by('-count')
+    queryset = Knowledge.objects.filter(Q(create_time__month=datetime.datetime.now().month)&Q(approved=True)).values('bucket').annotate(count=Count('id')).order_by('-count')
     d = dict(Knowledge.BUCKET)
     for result in queryset:
         db_data_list.append({
@@ -102,7 +102,7 @@ def chart_bar_monthly(request):
 
 def chart_line(request):
 
-    queryset = Knowledge.objects.filter(create_time__year=datetime.datetime.now().year).annotate(month=ExtractMonth('create_time')).values('month').annotate(count=Count('create_time'))
+    queryset = Knowledge.objects.filter(Q(create_time__year=datetime.datetime.now().year)&Q(approved=True)).annotate(month=ExtractMonth('create_time')).values('month').annotate(count=Count('create_time'))
 
     legend = [f"{datetime.datetime.now().year}年", ]
     series_list = [
